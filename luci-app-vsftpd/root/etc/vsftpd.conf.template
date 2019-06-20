@@ -1,0 +1,53 @@
+background=YES
+
+########## globe config ##########
+# listen=|LISTEN|
+# Low version's vsftpd not support ipv6
+# listen_ipv6=|LISTEN_IPV6|
+ftpd_banner=|FTPD_BANNER|
+max_clients=|MAX_CLIENTS|
+max_per_ip=|MAX_PER_IP|
+ascii_download_enable=|ASCII_DOWNLOAD_ENABLE|
+ascii_upload_enable=|ASCII_UPLOAD_ENABLE|
+connect_from_port_20=|CONNECT_FROM_PORT_20|
+pasv_enable=|PASV_ENABLE|
+pasv_min_port=|PASV_MIN_PORT|
+pasv_max_port=|PASV_MAX_PORT|
+async_abor_enable=|ASYNC_ABOR_ENABLE|
+ls_recurse_enable=|LS_RECURSE_ENABLE|
+dirmessage=|DIRMESSAGE|
+idle_session_timeout=|IDLE_SESSION_TIMEOUT|
+dirmessage_enable=|DIRMESSAGE_ENABLE|
+data_connection_timeout=|DATA_CONNECTION_TIMEOUT|
+xferlog_enable=|XFERLOG_ENABLE|
+xferlog_file=|XFERLOG_FILE|
+
+########## config for local user ##########
+local_enable=|LOACL_ENABLE|
+write_enable=|WRITE_ENABLE|
+chown_uploads=|CHOWN_UPLOADS|
+chroot_local_user=|CHROOT_LOCAL_USER|
+local_max_rate=|LOCAL_MAX_RATE|
+local_umask=|LOCAL_UMASK|
+check_shell=NO
+
+########## anonymous config ##########
+anonymous_enable=|ANONYMOUS_ENABLE|
+anon_upload_enable=|ANON_UPLOAD_ENABLE|
+anon_mkdir_write_enable=|ANON_MKDIR_WRITE_ENABLE|
+anon_root=|ANON_ROOT|
+anon_max_rate=|ANON_MAX_RATE|
+chown_username=|CHOWN_USERNAME|
+
+##########  SSL encryption config ##########
+# example key generation: openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/vsftpd/vsftpd_privkey.key -out /etc/vsftpd/vsftpd_cert.pem -subj /C="DE"/ST="Saxony"/L="Leipzig"/CN="OpenWrt"
+ssl_enable=|SSL_ENABLE|
+allow_anon_ssl=|ALLOW_ANON_SSL|
+rsa_cert_file=|RSA_CERT_FILE|
+rsa_private_key_file=|RSA_PRIVATE_KEY_FILE|
+ssl_ciphers=|SSL_CIPHERS|
+implicit_ssl=|IMPLICIT_SSL|
+require_ssl_reuse=|REQUIRE_SSL_REUSE|
+
+########## addition config ##########
+

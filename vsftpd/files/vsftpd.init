@@ -1,0 +1,234 @@
+#!/bin/sh /etc/rc.common
+# Copyright (C) 2006-2011 OpenWrt.org
+
+START=50
+
+start() {
+  config_load "vsftpd"
+
+  local enabled max_clients ftpd_banner listen_ipv6 max_per_ip ascii ascii_download_enable ascii_upload_enable connect_from_port_20 pasv_enable pasv_min_port pasv_max_port async_abor_enable ls_recurse_enable dirmessage_enable idle_session_timeout data_connection_timeout xferlog_enable xferlog_file
+  local local_enable write_enable chown_uploads chroot_local_user local_max_rate local_umask
+  local anonymous_enable anon_upload_enable anon_mkdir_write_enable anon_root anon_max_rate chown_username
+  local ssl_enable allow_anon_ssl rsa_cert_file rsa_private_key_file ssl_ciphers implicit_ssl require_ssl_reuse
+
+  config_get_bool enabled					main enabled
+  config_get_bool listen_ipv6				main listen_ipv6
+  config_get_bool connect_from_port_20		main connect_from_port_20
+  config_get_bool pasv_enable				main pasv_enable
+  config_get_bool async_abor_enable 		main async_abor_enable
+  config_get_bool ls_recurse_enable 		main ls_recurse_enable
+  config_get_bool dirmessage_enable 		main dirmessage_enable
+  config_get_bool xferlog_enable			main xferlog_enable
+  config_get_bool local_enable				main local_enable
+  config_get_bool write_enable				main write_enable
+  config_get_bool chown_uploads				main chown_uploads
+  config_get_bool chroot_local_user 		main chroot_local_user
+  config_get_bool anonymous_enable			main anonymous_enable
+  config_get_bool anon_upload_enable 		main anon_upload_enable
+  config_get_bool anon_mkdir_write_enable 	main anon_mkdir_write_enable
+  config_get_bool ssl_enable				main ssl_enable
+  config_get_bool allow_anon_ssl			main allow_anon_ssl
+  config_get_bool implicit_ssl				main implicit_ssl
+  config_get_bool require_ssl_reuse			main require_ssl_reuse
+
+  config_get ftpd_banner					main ftpd_banner
+  config_get max_clients					main max_clients
+  config_get max_per_ip						main max_per_ip
+  config_get ascii							main ascii
+  config_get pasv_min_port					main pasv_min_port
+  config_get pasv_max_port					main pasv_max_port
+  config_get idle_session_timeout			main idle_session_timeout
+  config_get data_connection_timeout		main data_connection_timeout
+  config_get xferlog_file					main xferlog_file
+  config_get local_max_rate					main local_max_rate
+  config_get local_umask					main local_umask
+  config_get anon_root						main anon_root
+  config_get anon_max_rate					main anon_max_rate
+  config_get chown_username					main chown_username
+  config_get rsa_cert_file					main rsa_cert_file
+  config_get rsa_private_key_file			main rsa_private_key_file
+  config_get ssl_ciphers					main ssl_ciphers
+
+  if [ "$enabled" != "1" ]; then
+    echo "vsftpd disabled!"
+    exit 0
+  fi
+  
+  if [ $connect_from_port_20 -eq 1 ]; then
+    connect_from_port_20="YES"
+  else
+    connect_from_port_20="NO"
+  fi
+  
+  if [ $pasv_enable -eq 1 ]; then
+    pasv_enable="YES"
+  else
+    pasv_enable="NO"
+  fi
+  
+  if [ $async_abor_enable -eq 1 ]; then
+    async_abor_enable="YES"
+  else
+    async_abor_enable="NO"
+  fi
+  
+  if [ $ls_recurse_enable -eq 1 ]; then
+    ls_recurse_enable="YES"
+  else
+    ls_recurse_enable="NO"
+  fi
+  
+  if [ $dirmessage_enable -eq 1 ]; then
+    dirmessage_enable="YES"
+  else
+    dirmessage_enable="NO"
+  fi
+  
+  if [ $xferlog_enable -eq 1 ]; then
+    xferlog_enable="YES"
+  else
+    xferlog_enable="NO"
+  fi
+  
+  if [ $local_enable -eq 1 ]; then
+    local_enable="YES"
+  else
+    local_enable="NO"
+  fi
+  
+  if [ $write_enable -eq 1 ]; then
+    write_enable="YES"
+  else
+    write_enable="NO"
+  fi
+
+  if [ $chown_uploads -eq 1 ]; then
+    chown_uploads="YES"
+  else
+    chown_uploads="NO"
+  fi
+  
+  if [ $chroot_local_user -eq 1 ]; then
+    chroot_local_user="YES"
+  else
+    chroot_local_user="NO"
+  fi
+  
+  if [ $anonymous_enable -eq 1 ]; then
+    anonymous_enable="YES"
+  else
+    anonymous_enable="NO"
+  fi
+  
+  if [ $anon_upload_enable -eq 1 ]; then
+    anon_upload_enable="YES"
+  else
+    anon_upload_enable="NO"
+  fi
+  
+  if [ $anon_mkdir_write_enable -eq 1 ]; then
+    anon_mkdir_write_enable="YES"
+  else
+    anon_mkdir_write_enable="NO"
+  fi
+
+  if [ $ssl_enable -eq 1 ]; then
+    ssl_enable="YES"
+  else
+    ssl_enable="NO"
+  fi
+
+  if [ $allow_anon_ssl -eq 1 ]; then
+    allow_anon_ssl="YES"
+  else
+    allow_anon_ssl="NO"
+  fi
+
+  if [ $implicit_ssl -eq 1 ]; then
+    implicit_ssl="YES"
+  else
+    require_ssl_reuse="NO"
+  fi
+
+  case $ascii in
+    "both")
+        ascii_download_enable="YES"
+        ascii_upload_enable="YES"
+        ;;
+    "download")
+        ascii_download_enable="YES"
+        ascii_upload_enable="NO"
+        ;;
+    "upload")
+        ascii_download_enable="NO"
+        ascii_upload_enable="YES"
+        ;;
+    "none")
+        ascii_download_enable="NO"
+        ascii_upload_enable="NO"
+        ;;
+    *)
+        ascii_download_enable="YES"
+        ascii_upload_enable="YES"
+        ;;
+  esac
+
+  mkdir -p /var/etc
+  sed -e "s#|FTPD_BANNER|#$ftpd_banner#g" \
+	  -e "s#|MAX_CLIENTS|#$max_clients#g" \
+	  -e "s#|MAX_PER_IP|#$max_per_ip#g" \
+	  -e "s#|ASCII_DOWNLOAD_ENABLE|#$ascii_download_enable#g" \
+	  -e "s#|ASCII_UPLOAD_ENABLE|#$ascii_upload_enable#g" \
+	  -e "s#|CONNECT_FROM_PORT_20|#$connect_from_port_20#g" \
+	  -e "s#|PASV_ENABLE|#$pasv_enable#g" \
+	  -e "s#|PASV_MIN_PORT|#$pasv_min_port#g" \
+	  -e "s#|PASV_MAX_PORT|#$pasv_max_port#g" \
+	  -e "s#|ASYNC_ABOR_ENABLE|#$async_abor_enable#g" \
+	  -e "s#|LS_RECURSE_ENABLE|#$ls_recurse_enable#g" \
+	  -e "s#|DIRMESSAGE|#$dirmessage#g" \
+	  -e "s#|IDLE_SESSION_TIMEOUT|#$idle_session_timeout#g" \
+	  -e "s#|DIRMESSAGE_ENABLE|#$dirmessage_enable#g" \
+	  -e "s#|DATA_CONNECTION_TIMEOUT|#$data_connection_timeout#g" \
+	  -e "s#|XFERLOG_ENABLE|#$xferlog_enable#g" \
+	  -e "s#|XFERLOG_FILE|#$xferlog_file#g" \
+	  -e "s#|LOACL_ENABLE|#$local_enable#g" \
+	  -e "s#|WRITE_ENABLE|#$write_enable#g" \
+	  -e "s#|CHOWN_UPLOADS|#$chown_uploads#g" \
+	  -e "s#|CHROOT_LOCAL_USER|#$chroot_local_user#g" \
+	  -e "s#|LOCAL_MAX_RATE|#$local_max_rate#g" \
+	  -e "s#|LOCAL_UMASK|#$local_umask#g" \
+	  -e "s#|ANONYMOUS_ENABLE|#$anonymous_enable#g" \
+	  -e "s#|ANON_UPLOAD_ENABLE|#$anon_upload_enable#g" \
+	  -e "s#|ANON_MKDIR_WRITE_ENABLE|#$anon_mkdir_write_enable#g" \
+	  -e "s#|ANON_ROOT|#$anon_root#g" \
+	  -e "s#|ANON_MAX_RATE|#$anon_max_rate#g" \
+	  -e "s#|CHOWN_USERNAME|#$chown_username#g" \
+	  -e "s#|SSL_ENABLE|#$ssl_enable#g" \
+	  -e "s#|ALLOW_ANON_SSL|#$allow_anon_ssl#g" \
+	  -e "s#|RSA_CERT_FILE|#$rsa_cert_file#g" \
+	  -e "s#|RSA_PRIVATE_KEY_FILE|#$rsa_private_key_file#g" \
+	  -e "s#|SSL_CIPHERS|#$ssl_ciphers#g" \
+	  -e "s#|IMPLICIT_SSL|#$implicit_ssl#g" \
+	  -e "s#|REQUIRE_SSL_REUSE|#$require_ssl_reuse#g" \
+      -e "s#|DATA_CONNECTION_TIMEOUT|#$data_connection_timeout#g" \
+      /etc/vsftpd.conf.template > /var/etc/vsftpd.conf.template
+
+  if [ $listen_ipv6 -eq 1 ]; then
+	sed -e "s#\# listen_ipv6=|LISTEN_IPV6|#listen_ipv6=YES#g" \
+	    -e "s#\# listen=|LISTEN|#listen=NO#g" \
+		/var/etc/vsftpd.conf.template | grep  "=[0-9,A-Z,a-z,/]" > /var/etc/vsftpd.conf
+  else
+	sed -e "s#\# listen=|LISTEN|#listen=YES#g" /var/etc/vsftpd.conf.template | grep  "=[0-9,A-Z,a-z,/]" > /var/etc/vsftpd.conf
+  fi
+  
+	mkdir -m 0755 -p /var/run/vsftpd
+	service_start /usr/sbin/vsftpd /var/etc/vsftpd.conf
+}
+
+stop() {
+	service_stop /usr/sbin/vsftpd
+}
+
+restart() {
+	stop;sleep 2;start
+}
