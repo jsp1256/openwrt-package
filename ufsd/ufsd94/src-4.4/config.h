@@ -451,7 +451,7 @@
 /* #undef UFSD_FAT */
 
 /* HFS Using flag */
-#define UFSD_HFS /**/
+/* #undef UFSD_HFS */
 
 /* NTFS Using flag */
 #define UFSD_NTFS /**/
