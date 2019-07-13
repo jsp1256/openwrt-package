@@ -41,8 +41,6 @@ static DEFINE_PER_CPU(struct pagevec, lru_add_pvec);
 extern int vfs_fsync_range(struct file *file, loff_t start, loff_t end,
 			   int datasync);
 extern ssize_t generic_file_read_iter(struct kiocb *, struct iov_iter *);
-extern struct buffer_head *__getblk_gfp(struct block_device *bdev,
-				sector_t block, unsigned size, gfp_t gfp);
 extern ssize_t iter_file_splice_write(struct pipe_inode_info *,
 		struct file *, loff_t *, size_t, unsigned int);
 extern struct timespec64 current_kernel_time64(void);
@@ -51,8 +49,12 @@ extern struct page *pagecache_get_page(struct address_space *mapping, pgoff_t of
 extern struct page *pagecache_get_page(struct address_space *mapping, pgoff_t offset,
 		int fgp_flags, gfp_t cache_gfp_mask);
 extern int file_remove_privs(struct file *file);
+/*
 extern struct buffer_head *__bread_gfp(struct block_device *,
 				sector_t block, unsigned size, gfp_t gfp);
+extern struct buffer_head *__getblk_gfp(struct block_device *bdev,
+				sector_t block, unsigned size, gfp_t gfp);
+*/
 
 
 extern ssize_t generic_perform_write(struct file *, struct iov_iter *, loff_t);
@@ -232,13 +234,6 @@ int generic_file_aio_read(struct kiocb *iocb, const struct iovec *iov,
 	return generic_file_read_iter(iocb, &i);
 }
 
-struct buffer_head *__getblk(struct block_device *bdev,
-					   sector_t block,
-					   unsigned size)
-{
-	return __getblk_gfp(bdev, block, size, __GFP_MOVABLE);
-}
-
 
 /*
   based on https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/diff/?id=8d0207652cbe27d1f962050737848e5ad4671958
@@ -313,10 +308,19 @@ ssize_t do_sync_write(struct file *filp, const char __user *buf, size_t len, lof
 	return __vfs_write(filp, buf, len, ppos);
 }
 
+/*
 struct buffer_head *__bread(struct block_device *bdev, sector_t block, unsigned size)
 {
 	return __bread_gfp(bdev, block, size, __GFP_MOVABLE);
 }
+
+struct buffer_head *__getblk(struct block_device *bdev,
+					   sector_t block,
+					   unsigned size)
+{
+	return __getblk_gfp(bdev, block, size, __GFP_MOVABLE);
+}
+*/
 
 //注意：kernel 2.6.36中定义不一样（3.10.14同上）,处理方式为搁置
 //void __lru_cache_add(struct page *page, enum lru_list lru)

@@ -24,7 +24,7 @@ define KernelPackage/ufsd-94
   TITLE:=Paragon ufsd 9.4
   DEPENDS:=+kmod-nls-base +kmod-nls-utf8 @!arm:mips
   #@TARGET_ar71xx
-  FILES:=$(PKG_BUILD_DIR)/ufsd.ko 
+  FILES:=$(PKG_BUILD_DIR)/ufsd.ko $(PKG_BUILD_DIR)/jnl.ko
   AUTOLOAD:=$(call AutoLoad,50,ufsd)
 endef
 
@@ -51,6 +51,10 @@ define Build/Prepare
 	cp -r src-common/. $(PKG_BUILD_DIR)
 	cp -r src-$(KERNEL_VER)/. $(PKG_BUILD_DIR)
 	$(CP) obj/*.o_shipped $(PKG_BUILD_DIR)/
+ifeq ($(KERNEL_VER), 4.4)
+	cp -r shell/. $(PKG_BUILD_DIR)
+	cd $(PKG_BUILD_DIR)/ && sh global_ufsdapi.sh && sh progress_lib.sh
+endif
 endef
 
 

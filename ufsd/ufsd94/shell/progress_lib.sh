@@ -12,3 +12,7 @@ for i in $a
 do
 	mipsel-openwrt-linux-objcopy libufsd_mipsel.o_shipped --redefine-sym "$i"="$i""_hide"
 done
+
+##将部分内联函数全局化
+mipsel-openwrt-linux-objcopy libufsd_mipsel.o_shipped --globalize-symbol  __bread
+mipsel-openwrt-linux-objcopy libufsd_mipsel.o_shipped --globalize-symbol __getblk
