@@ -1,5 +1,3 @@
-00000000 l     F .text	00000028 __getblk
-00000028 l     F .text	00000028 __bread
 00000050 l     F .text	00000084 ufsd_filemap_fault
 000000d4 l     F .text	00000008 ufsd_file_sendpage
 000000dc l     F .text	0000003c ufsd_test_inode
