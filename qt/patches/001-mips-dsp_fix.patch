@@ -1,0 +1,18 @@
+Index: qt-everywhere-src-5.15.2/qtbase/src/corelib/text/qstring.cpp
+===================================================================
+--- qt-everywhere-src-5.15.2.orig/qtbase/src/corelib/text/qstring.cpp
++++ qt-everywhere-src-5.15.2/qtbase/src/corelib/text/qstring.cpp
+@@ -12837,7 +12837,13 @@ QString QString::toHtmlEscaped() const
+  */
+ void QAbstractConcatenable::appendLatin1To(const char *a, int len, QChar *out) noexcept
+ {
++#if defined(__mips_dsp)
++    if (len == 0)
++            return;
+     qt_from_latin1(reinterpret_cast<ushort *>(out), a, uint(len));
++#else 
++    qt_from_latin1(reinterpret_cast<ushort *>(out), a, uint(len));
++#endif
+ }
+ 
+ QT_END_NAMESPACE

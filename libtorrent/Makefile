@@ -1,0 +1,74 @@
+include $(TOPDIR)/rules.mk
+
+PKG_NAME:=libtorrent-rasterbar
+PKG_VERSION:=1_1_14
+PKG_RELEASE:=$(AUTORELEASE)
+PKG_FILE_DIR_NAME:=libtorrent-libtorrent-$(PKG_VERSION)
+PKG_SOURCE:=$(PKG_FILE_DIR_NAME).tar.gz
+PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_FILE_DIR_NAME)
+PKG_LICENSE:=BSD-3-Clause
+PKG_LICENSE_FILES:=COPYING
+
+include $(INCLUDE_DIR)/package.mk
+include $(INCLUDE_DIR)/cmake.mk
+#CONFIG_BUILD_NLS:=y
+#include $(INCLUDE_DIR)/nls.mk
+CMAKE_OPTIONS+=-DCMAKE_CXX_STANDARD=14 
+EXTRA_CXXFLAGS+=-DTORRENT_USE_ICONV=0
+define Package/libtorrent-rasterbar/Default
+	TITLE:=Rasterbar BitTorrent library
+	URL:=https://libtorrent.org/
+endef
+
+define Package/libtorrent-rasterbar
+	$(call Package/libtorrent-rasterbar/Default)
+	SECTION:=libs
+	CATEGORY:=Libraries
+	DEPENDS:=+boost-system +libopenssl +libatomic 
+endef
+
+#define Package/python3-libtorrent
+#	$(call Package/libtorrent-rasterbar/Default)
+#	SECTION:=lang
+#	CATEGORY:=Languages
+#	SUBMENU:=Python
+#	TITLE+= (Python 3)
+#	DEPENDS:=+libtorrent-rasterbar +boost-python
+#endef
+
+define Package/libtorrent-rasterbar/description
+	Rasterbar libtorrent is a C++ library that aims to be a good alternative to
+	all the other bittorrent implementations around.
+endef
+
+#define Package/python3-libtorrent/description
+#	$(call Package/libtorrent-rasterbar/description)
+#	This package contains Python 3 bindings for the libtorrent-rasterbar library.
+#endef
+
+
+#CMAKE_OPTIONS += \
+#	-Dpython-bindings=ON \
+#	-Dpython-egg-info=ON
+
+define Build/InstallDev
+	$(INSTALL_DIR) $(1)/usr/include
+	$(CP) $(PKG_INSTALL_DIR)/usr/include/libtorrent $(1)/usr/include/
+	$(INSTALL_DIR) $(1)/usr/lib
+	$(CP) $(PKG_INSTALL_DIR)/usr/lib/libtorrent-rasterbar.so* $(1)/usr/lib/
+	$(INSTALL_DIR) $(1)/usr/lib/pkgconfig
+	$(CP) $(PKG_INSTALL_DIR)/usr/lib/pkgconfig/libtorrent-rasterbar.pc $(1)/usr/lib/pkgconfig/
+endef
+
+define Package/libtorrent-rasterbar/install
+	$(INSTALL_DIR) $(1)/usr/lib
+	$(CP) $(PKG_INSTALL_DIR)/usr/lib/libtorrent-rasterbar.so.* $(1)/usr/lib/
+endef
+
+#define Package/python3-libtorrent/install
+#	$(INSTALL_DIR) $(1)/usr/lib/python2.7/site-packages
+#	$(CP) $(PKG_INSTALL_DIR)/usr/lib/python2.7/site-packages/*.so* $(1)/usr/lib/python2.7/site-packages/
+#endef
+
+$(eval $(call BuildPackage,libtorrent-rasterbar))
+#$(eval $(call BuildPackage,python3-libtorrent))

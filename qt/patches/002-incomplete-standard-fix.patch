@@ -1,0 +1,86 @@
+Index: qt-everywhere-src-5.14.1/qtdeclarative/src/qml/jsruntime/qv4mathobject.cpp
+===================================================================
+--- qt-everywhere-src-5.14.1.orig/qtdeclarative/src/qml/jsruntime/qv4mathobject.cpp
++++ qt-everywhere-src-5.14.1/qtdeclarative/src/qml/jsruntime/qv4mathobject.cpp
+@@ -146,7 +146,7 @@ ReturnedValue MathObject::method_acosh(c
+     if (v < 1)
+         RETURN_RESULT(Encode(qt_qnan()));
+ 
+-#ifdef Q_OS_ANDROID // incomplete std :-(
++#ifdef GCC_INCOMPLETE_STD // incomplete std :-(
+     RETURN_RESULT(Encode(std::log(v +std::sqrt(v + 1) * std::sqrt(v - 1))));
+ #else
+     RETURN_RESULT(Encode(std::acosh(v)));
+@@ -168,7 +168,7 @@ ReturnedValue MathObject::method_asinh(c
+     if (v == 0.0)
+         RETURN_RESULT(Encode(v));
+ 
+-#ifdef Q_OS_ANDROID // incomplete std :-(
++#ifdef GCC_INCOMPLETE_STD // incomplete std :-(
+     RETURN_RESULT(Encode(std::log(v +std::sqrt(1 + v * v))));
+ #else
+     RETURN_RESULT(Encode(std::asinh(v)));
+@@ -190,7 +190,7 @@ ReturnedValue MathObject::method_atanh(c
+     if (v == 0.0)
+         RETURN_RESULT(Encode(v));
+ 
+-#ifdef Q_OS_ANDROID // incomplete std :-(
++#ifdef GCC_INCOMPLETE_STD // incomplete std :-(
+     if (-1 < v && v < 1)
+         RETURN_RESULT(Encode(0.5 * (std::log(v + 1) - std::log(v - 1))));
+ 
+@@ -224,7 +224,7 @@ ReturnedValue MathObject::method_atan2(c
+ ReturnedValue MathObject::method_cbrt(const FunctionObject *, const Value *, const Value *argv, int argc)
+ {
+     double v = argc ? argv[0].toNumber() : qt_qnan();
+-#ifdef Q_OS_ANDROID // incomplete std :-(
++#ifdef GCC_INCOMPLETE_STD // incomplete std :-(
+     RETURN_RESULT(Encode(copySign(std::exp(std::log(std::abs(v)) / 3), v)));
+ #else
+     RETURN_RESULT(Encode(std::cbrt(v))); // cube root
+@@ -282,7 +282,7 @@ ReturnedValue MathObject::method_expm1(c
+         else
+             RETURN_RESULT(Encode(qt_inf()));
+     } else {
+-#ifdef Q_OS_ANDROID // incomplete std :-(
++#ifdef GCC_INCOMPLETE_STD // incomplete std :-(
+         RETURN_RESULT(Encode(std::exp(v) - 1));
+ #else
+         RETURN_RESULT(Encode(std::expm1(v)));
+@@ -313,7 +313,7 @@ ReturnedValue MathObject::method_hypot(c
+     // avoid the loss of precision from overflows and underflows" (as std::hypot does).
+     double v = argc ? argv[0].toNumber() : 0;
+     // Spec mandates +0 on no args; and says nothing about what to do if toNumber() signals ...
+-#ifdef Q_OS_ANDROID // incomplete std :-(
++#ifdef GCC_INCOMPLETE_STD // incomplete std :-(
+     bool big = qt_is_inf(v), bad = std::isnan(v);
+     v *= v;
+     for (int i = 1; !big && i < argc; i++) {
+@@ -365,9 +365,6 @@ ReturnedValue MathObject::method_log10(c
+ 
+ ReturnedValue MathObject::method_log1p(const FunctionObject *, const Value *, const Value *argv, int argc)
+ {
+-#if !defined(__ANDROID__)
+-    using std::log1p;
+-#endif
+     double v = argc ? argv[0].toNumber() : qt_qnan();
+     if (v < -1)
+         RETURN_RESULT(Encode(qt_qnan()));
+@@ -381,7 +378,7 @@ ReturnedValue MathObject::method_log2(co
+     if (v < 0) {
+         RETURN_RESULT(Encode(qt_qnan()));
+     } else {
+-#ifdef Q_OS_ANDROID // incomplete std :-(
++#ifdef GCC_INCOMPLETE_STD // incomplete std :-(
+         // Android ndk r10e doesn't have std::log2, so fall back.
+         const double ln2 = std::log(2.0);
+         RETURN_RESULT(Encode(std::log(v) / ln2));
+@@ -540,7 +537,7 @@ ReturnedValue MathObject::method_tanh(co
+ ReturnedValue MathObject::method_trunc(const FunctionObject *, const Value *, const Value *argv, int argc)
+ {
+     double v = argc ? argv[0].toNumber() : qt_qnan();
+-#ifdef Q_OS_ANDROID // incomplete std :-(
++#ifdef GCC_INCOMPLETE_STD // incomplete std :-(
+     if (std::isnan(v) || qt_is_inf(v) || qIsNull(v))
+         RETURN_RESULT(Encode(v));
+     // Nearest integer not greater in magnitude:
